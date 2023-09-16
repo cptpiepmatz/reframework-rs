@@ -5,13 +5,13 @@ edition = "2021"
 
 [workspace]
 members = [
-    "sys"
+    "sys",
+    "examples/weapon_stay_big_plugin"
 ]
-
-[[example]]
-name = "weapon_stay_big_plugin"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-reframework-sys = { path = "./sys" }
+reframework-sys = { version = "0.1.0", path = "./sys" }
+
+winapi = { version = "0.3", features = ["debugapi"] }

@@ -1,0 +1,12 @@
+[package]
+name = "weapon_stay_big_plugin"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+path = "plugin.rs"
+
+[dependencies]
+reframework = { path = "../../" }
+reframework-sys = { path = "../../sys" }
