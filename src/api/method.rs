@@ -1,6 +1,6 @@
 use crate::api::Method;
 use crate::hook::{DuplicateHookError, Hook, HookMetadataRegistryEntry, HOOK_METADATA_REGISTRY};
-use reframework_sys::bindings::*;
+use reframework_sys::*;
 
 impl<'api> Method<'api> {
     pub fn add_hook<H>(&self, hook: H) -> Result<(), DuplicateHookError>

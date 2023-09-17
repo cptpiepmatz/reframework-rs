@@ -1,5 +1,5 @@
 use crate::error::NullPtrError;
-use reframework_sys::bindings::*;
+use reframework_sys::*;
 use std::error::Error;
 use std::fmt::{Display, Formatter};
 use std::sync::OnceLock;

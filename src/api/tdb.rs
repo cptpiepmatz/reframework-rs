@@ -1,5 +1,5 @@
 use crate::api::{Method, TDB};
-use reframework_sys::bindings::REFrameworkMethodHandle__;
+use reframework_sys::*;
 use std::ffi::CString;
 
 impl<'api> TDB<'api> {

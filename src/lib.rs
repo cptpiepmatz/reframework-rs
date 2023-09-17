@@ -3,7 +3,7 @@
 #[cfg(not(windows))]
 compile_error!("This crate can only be compiled on Windows.");
 
-use reframework_sys::bindings::*;
+use reframework_sys::*;
 use std::ffi::c_int;
 
 pub mod api;
