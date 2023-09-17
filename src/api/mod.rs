@@ -10,6 +10,7 @@ pub mod hook;
 pub mod managed_object;
 pub mod method;
 pub mod tdb;
+pub mod type_definition;
 
 pub(crate) static API_REF: OnceLock<API> = OnceLock::new();
 
