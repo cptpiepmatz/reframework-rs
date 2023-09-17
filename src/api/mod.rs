@@ -54,10 +54,12 @@ pub struct ManagedObject<'api> {
     handle: *mut REFrameworkManagedObjectHandle__,
 }
 
+pub struct PluginInitializeParam(REFrameworkPluginInitializeParam);
+
 impl API {
     pub fn initialize(
         name: &'static str,
-        param: *const REFrameworkPluginInitializeParam,
+        param: *const PluginInitializeParam,
     ) -> Result<Self, APIInitError> {
         if param.is_null() {
             return Err(APIInitError::ParamIsNull(NullPtrError::new()));
@@ -67,8 +69,8 @@ impl API {
             return Err(APIInitError::AlreadyInitialized);
         }
 
-        // SAFETY: we checked that this is not null
-        let param = unsafe { &(*param) };
+        // SAFETY: we checked that this is not null, also this new-type has the same memory layout
+        let param: &REFrameworkPluginInitializeParam = unsafe { &(*param.cast()) };
 
         // SAFETY: if param is not null, then this is also not null
         let sdk = unsafe { &(*param.sdk) };

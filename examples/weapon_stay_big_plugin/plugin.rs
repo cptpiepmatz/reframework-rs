@@ -1,7 +1,6 @@
 use reframework::api::API;
 use reframework::hook::{Hook, PreHookResult, VMContext};
-use reframework::{debug, ManagedObject, MethodParameter};
-use reframework_sys::bindings::REFrameworkPluginInitializeParam;
+use reframework::{debug, ManagedObject, MethodParameter, PluginInitializeParam};
 
 struct PlayerWeaponCtrlStart;
 
@@ -28,7 +27,7 @@ reframework::plugin_required_version!();
 #[no_mangle]
 #[allow(clippy::not_unsafe_ptr_arg_deref)]
 pub unsafe extern "C" fn reframework_plugin_initialize(
-    param: *const REFrameworkPluginInitializeParam,
+    param: *const PluginInitializeParam,
 ) -> bool {
     let api = API::initialize("Weapon Stay Big", param).expect("should init");
     let tdb = api.tdb();
