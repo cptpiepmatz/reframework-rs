@@ -1,13 +1,13 @@
-use crate::api::Method;
+use crate::api::method::Method;
+use crate::API;
 use reframework_sys::*;
 use std::ffi::CString;
-use crate::API;
 
 pub struct TDB<'api> {
     pub(crate) api: &'api API,
 
     // lifetime is bound the API, this is therefore implicitly bound too
-    pub(crate) handle: *mut REFrameworkTDBHandle__,
+    pub(crate) handle: REFrameworkTDBHandle,
 }
 
 impl<'api> TDB<'api> {
