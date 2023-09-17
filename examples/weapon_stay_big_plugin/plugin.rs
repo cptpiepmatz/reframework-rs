@@ -1,6 +1,9 @@
+#![allow(clippy::missing_safety_doc)]
+
+use reframework::api::managed_object::ManagedObject;
 use reframework::api::API;
 use reframework::hook::{Hook, PreHookResult, VMContext};
-use reframework::{debug, ManagedObject, MethodParameter, PluginInitializeParam};
+use reframework::{MethodParameter, PluginInitializeParam};
 
 struct PlayerWeaponCtrlStart;
 
@@ -9,12 +12,15 @@ impl Hook for PlayerWeaponCtrlStart {
     const METHOD_NAME: &'static str = "start";
 
     fn pre_fn(
-        api: &API,
-        vm_context: Option<&VMContext>,
+        _api: &API,
+        _vm_context: Option<&VMContext>,
         this: Option<&ManagedObject>,
-        params: &[&MethodParameter],
+        _params: &[&MethodParameter],
     ) -> PreHookResult {
-        debug!("we got the new hook interface!");
+        let this = this.expect("not native and not static");
+        if let Some(field) = this.get_field_mut::<f32>("_bodyConstScale") {
+            *field = 1.0;
+        }
 
         PreHookResult::CallOriginal
     }
