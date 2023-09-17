@@ -11,3 +11,4 @@ path = "src/lib.rs"
 
 [build-dependencies]
 bindgen = "0.68"
+static-toml = "1"

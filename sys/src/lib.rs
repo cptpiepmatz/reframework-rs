@@ -78,17 +78,11 @@ pub use bindings::REFrameworkResourceManagerHandle;
 pub use bindings::REFrameworkResourceManagerHandle__;
 pub use bindings::REFrameworkVMContextHandle;
 pub use bindings::REFrameworkVMContextHandle__;
-/// NOT a type definition
 pub use bindings::REFrameworkTypeInfoHandle;
-/// NOT a type definition
 pub use bindings::REFrameworkTypeInfoHandle__;
-/// NOT a TDB property
 pub use bindings::REFrameworkReflectionPropertyHandle;
-/// NOT a TDB property
 pub use bindings::REFrameworkReflectionPropertyHandle__;
-/// NOT a TDB method
 pub use bindings::REFrameworkReflectionMethodHandle;
-/// NOT a TDB method
 pub use bindings::REFrameworkReflectionMethodHandle__;
 
 pub use bindings::REFRAMEWORK_CREATE_INSTANCE_FLAGS_NONE;
@@ -127,15 +121,12 @@ pub use bindings::REFrameworkResourceManager;
 
 pub use bindings::REFrameworkResource;
 
-/// NOT a type definition
 pub use bindings::REFrameworkTypeInfo;
 
 pub use bindings::REFrameworkVMContext;
 
-/// NOT a TDB method
 pub use bindings::REFrameworkReflectionMethod;
 
-/// NOT a TDB property
 pub use bindings::REFrameworkReflectionProperty;
 
 pub use bindings::REFPreHookFn;
@@ -143,11 +134,6 @@ pub use bindings::REFPostHookFn;
 
 pub use bindings::REFrameworkSDKFunctions;
 
-/// these are NOT pointers to the actual objects
-/// they are interfaces with functions that take handles to the objects
-/// the functions, however, can return the actual objects
 pub use bindings::REFrameworkSDKData;
 
 pub use bindings::REFrameworkPluginInitializeParam;
-
-
