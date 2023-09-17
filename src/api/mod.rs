@@ -54,6 +54,7 @@ pub struct ManagedObject<'api> {
     handle: *mut REFrameworkManagedObjectHandle__,
 }
 
+#[repr(transparent)]
 pub struct PluginInitializeParam(REFrameworkPluginInitializeParam);
 
 impl API {

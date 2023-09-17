@@ -1,4 +1,5 @@
 #![allow(clippy::not_unsafe_ptr_arg_deref)] // all safety checks are internally
+#![deny(improper_ctypes_definitions)]
 
 #[cfg(not(windows))]
 compile_error!("This crate can only be compiled on Windows.");
@@ -13,6 +14,7 @@ pub mod error;
 #[doc(hidden)]
 pub mod debug;
 
+#[repr(transparent)]
 pub struct PluginVersion(REFrameworkPluginVersion);
 
 pub fn plugin_required_version(version: *mut PluginVersion) {

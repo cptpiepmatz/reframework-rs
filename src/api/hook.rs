@@ -112,5 +112,8 @@ impl Display for DuplicateHookError {
 
 impl Error for DuplicateHookError {}
 
+#[repr(transparent)]
 pub struct VMContext(REFrameworkVMContext);
+
+#[repr(transparent)]
 pub struct TypeDefinitionHandle(REFrameworkTypeDefinitionHandle);
