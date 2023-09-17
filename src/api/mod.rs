@@ -5,6 +5,7 @@ use std::fmt::{Display, Formatter};
 use std::sync::OnceLock;
 use tdb::TDB;
 
+pub mod field;
 pub mod hook;
 pub mod managed_object;
 pub mod method;
