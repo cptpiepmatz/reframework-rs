@@ -68,16 +68,6 @@ impl<'api> Method<'api> {
         Ok(())
     }
 
-    pub unsafe fn add_hook_raw(
-        &self,
-        pre_fn: REFPreHookFn,
-        post_fn: REFPostHookFn,
-        ignore_jmp: bool,
-    ) {
-        let functions = &(*self.api.sdk.functions);
-        functions.add_hook.expect("not null")(self.handle, pre_fn, post_fn, ignore_jmp);
-    }
-
     pub fn is_static(&self) -> bool {
         // SAFETY: SDK is trusted
         unsafe { self.api.sdk_method().is_static.expect("not null")(self.handle) }
