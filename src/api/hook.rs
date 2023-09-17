@@ -1,5 +1,5 @@
-use crate::api::{ManagedObject, API_REF};
-use crate::{MethodParameter, API};
+use crate::api::API_REF;
+use crate::{API, MethodParameter};
 use reframework_sys::*;
 use std::collections::HashMap;
 use std::error::Error;
@@ -7,6 +7,7 @@ use std::ffi::{c_int, c_void};
 use std::fmt::{Display, Formatter};
 use std::slice;
 use std::sync::{OnceLock, RwLock};
+use crate::api::managed_object::ManagedObject;
 
 type HookMetadataRegistryKey = (&'static str, &'static str);
 

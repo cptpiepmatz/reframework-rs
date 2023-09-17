@@ -3,6 +3,7 @@ use reframework_sys::*;
 use std::error::Error;
 use std::fmt::{Display, Formatter};
 use std::sync::OnceLock;
+use tdb::TDB;
 
 pub mod hook;
 pub mod managed_object;
@@ -26,32 +27,18 @@ unsafe impl Sync for API {}
 
 unsafe impl Send for API {}
 
-pub struct TDB<'api> {
-    api: &'api API,
-
-    // lifetime is bound the API, this is therefore implicitly bound too
-    pub handle: *mut REFrameworkTDBHandle__,
-}
-
 pub struct Method<'api> {
-    api: &'api API,
+    pub(crate) api: &'api API,
 
     // lifetime is bound the API, this is therefore implicitly bound too
-    pub handle: *mut REFrameworkMethodHandle__,
+    pub(crate) handle: *mut REFrameworkMethodHandle__,
 }
 
 pub struct MethodParameter<'api> {
-    api: &'api API,
+    pub(crate) api: &'api API,
 
     // lifetime is bound the API, this is therefore implicitly bound too
-    type_definition_handle: *mut REFrameworkTypeDefinitionHandle,
-}
-
-pub struct ManagedObject<'api> {
-    api: &'api API,
-
-    // lifetime is bound the API, this is therefore implicitly bound too
-    handle: *mut REFrameworkManagedObjectHandle__,
+    pub(crate) type_definition_handle: *mut REFrameworkTypeDefinitionHandle,
 }
 
 #[repr(transparent)]

@@ -1,6 +1,14 @@
-use crate::api::{Method, TDB};
+use crate::api::Method;
 use reframework_sys::*;
 use std::ffi::CString;
+use crate::API;
+
+pub struct TDB<'api> {
+    pub(crate) api: &'api API,
+
+    // lifetime is bound the API, this is therefore implicitly bound too
+    pub(crate) handle: *mut REFrameworkTDBHandle__,
+}
 
 impl<'api> TDB<'api> {
     pub fn find_method(&self, type_name: &str, name: &str) -> Option<Method> {
