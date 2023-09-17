@@ -9,4 +9,3 @@ path = "plugin.rs"
 
 [dependencies]
 reframework = { path = "../../" }
-reframework-sys = { path = "../../sys" }
