@@ -1,7 +1,7 @@
+use bindgen::callbacks::ParseCallbacks;
 use std::env;
 use std::fmt::Debug;
 use std::path::PathBuf;
-use bindgen::callbacks::ParseCallbacks;
 
 const HEADER_FILE: &str = include_str!("deps/REFramework/include/reframework/API.h");
 
