@@ -27,13 +27,6 @@ unsafe impl Sync for API {}
 
 unsafe impl Send for API {}
 
-pub struct Method<'api> {
-    pub(crate) api: &'api API,
-
-    // lifetime is bound the API, this is therefore implicitly bound too
-    pub(crate) handle: *mut REFrameworkMethodHandle__,
-}
-
 pub struct MethodParameter<'api> {
     pub(crate) api: &'api API,
 

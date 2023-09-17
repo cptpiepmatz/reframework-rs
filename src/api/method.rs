@@ -1,6 +1,13 @@
-use crate::api::Method;
 use crate::hook::{DuplicateHookError, Hook, HookMetadataRegistryEntry, HOOK_METADATA_REGISTRY};
+use crate::API;
 use reframework_sys::*;
+
+pub struct Method<'api> {
+    pub(crate) api: &'api API,
+
+    // lifetime is bound the API, this is therefore implicitly bound too
+    pub(crate) handle: REFrameworkMethodHandle,
+}
 
 impl<'api> Method<'api> {
     pub fn add_hook<H>(&self, hook: H) -> Result<(), DuplicateHookError>
