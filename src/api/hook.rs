@@ -1,5 +1,6 @@
+use crate::api::managed_object::ManagedObject;
 use crate::api::API_REF;
-use crate::{API, MethodParameter};
+use crate::{MethodParameter, API};
 use reframework_sys::*;
 use std::collections::HashMap;
 use std::error::Error;
@@ -7,7 +8,6 @@ use std::ffi::{c_int, c_void};
 use std::fmt::{Display, Formatter};
 use std::slice;
 use std::sync::{OnceLock, RwLock};
-use crate::api::managed_object::ManagedObject;
 
 type HookMetadataRegistryKey = (&'static str, &'static str);
 
@@ -50,24 +50,35 @@ pub trait Hook {
 
         let offset = entry.has_context as u32 + entry.has_this as u32;
         let params: &[&MethodParameter] = unsafe {
-            slice::from_raw_parts(
-                argv.offset(offset as isize).cast(),
-                entry.param_count - offset as usize,
-            )
-        };
-
-        let (vm_context, this): (Option<&VMContext>, Option<&ManagedObject>) = unsafe {
-            match (entry.has_context, entry.has_this) {
-                (false, false) => (None, None),
-                (false, true) => (None, Some(&*argv.cast())),
-                (true, false) => (Some(&*argv.cast()), None),
-                (true, true) => (Some(&*argv.offset(0).cast()), Some(&*argv.offset(1).cast())),
-            }
+            slice::from_raw_parts(argv.offset(offset as isize).cast(), entry.param_count)
         };
 
         let api = API_REF.get().expect("already init");
 
-        Self::pre_fn(api, vm_context, this, params) as c_int
+        let mut vm_context: Option<VMContext> = None;
+        let mut this: Option<ManagedObject> = None;
+        // FIXME: this ManagedObject is totally wrong
+        unsafe {
+            match (entry.has_context, entry.has_this) {
+                (false, false) => (),
+                (false, true) => {
+                    this = Some(ManagedObject {
+                        api,
+                        handle: *argv.cast(),
+                    });
+                }
+                (true, false) => (), // TODO: prepare VMContext properly,
+                (true, true) => {
+                    // TODO: do the VMContext here too
+                    this = Some(ManagedObject {
+                        api,
+                        handle: *argv.offset(1).cast(),
+                    });
+                }
+            }
+        }
+
+        Self::pre_fn(api, vm_context.as_ref(), this.as_ref(), params) as c_int
     }
 
     type ReturnValue;
