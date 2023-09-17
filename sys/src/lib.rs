@@ -2,6 +2,9 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
+// skip rustfmt on this file
+#![cfg_attr(rustfmt, rustfmt_skip)]
+
 mod bindings {
     include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 }
