@@ -5,11 +5,13 @@
 compile_error!("This crate can only be compiled on Windows.");
 
 use reframework_sys::*;
-use std::ffi::c_int;
+use std::ffi::{c_int, c_void};
 
 pub mod api;
 pub use api::*;
+
 pub mod error;
+pub mod managed;
 
 #[doc(hidden)]
 pub mod debug;
@@ -39,4 +41,23 @@ macro_rules! plugin_required_version {
             $crate::plugin_required_version(version)
         }
     };
+}
+
+#[repr(transparent)]
+#[derive(Debug, Copy, Clone)]
+pub struct VMContext(pub(crate) REFrameworkVMContextHandle);
+
+unsafe impl Send for VMContext {}
+unsafe impl Sync for VMContext {}
+
+#[repr(transparent)]
+#[derive(Debug, Copy, Clone)]
+pub struct NativeSingleton(pub(crate) *mut c_void);
+
+unsafe impl Send for NativeSingleton {}
+unsafe impl Sync for NativeSingleton {}
+
+mod private {
+    pub trait Sealed {}
+    impl<T> Sealed for T {}
 }

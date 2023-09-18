@@ -63,7 +63,6 @@ pub trait Hook {
                 (false, false) => (),
                 (false, true) => {
                     this = Some(ManagedObject {
-                        api,
                         handle: *argv.cast(),
                     });
                 }
@@ -71,7 +70,6 @@ pub trait Hook {
                 (true, true) => {
                     // TODO: do the VMContext here too
                     this = Some(ManagedObject {
-                        api,
                         handle: *argv.offset(1).cast(),
                     });
                 }
@@ -124,6 +122,7 @@ impl Display for DuplicateHookError {
 
 impl Error for DuplicateHookError {}
 
+// TODO: probably incorrect type here
 #[repr(transparent)]
 pub struct VMContext(REFrameworkVMContext);
 

@@ -1,20 +1,23 @@
+use crate::api::API_REF;
 use crate::managed_object::ManagedObject;
-use crate::API;
 use reframework_sys::*;
 
-pub struct Field<'api> {
-    pub(crate) api: &'api API,
-
-    // lifetime is bound the API, this is therefore implicitly bound too
+#[repr(transparent)]
+#[derive(Debug, Copy, Clone)]
+pub struct Field {
     pub(crate) handle: REFrameworkFieldHandle,
 }
 
-impl<'api> Field<'api> {
-    pub(crate) fn s_get_data_mut<T>(
-        api: &'api API,
+unsafe impl Sync for Field {}
+unsafe impl Send for Field {}
+
+impl Field {
+    pub(crate) fn s_get_data_mut<'d, T>(
         handle: REFrameworkFieldHandle,
         managed_object: &ManagedObject,
-    ) -> Option<&'api mut T> {
+    ) -> Option<&'d mut T> {
+        let api = API_REF.get().expect("is init");
+
         let field = api.sdk_field();
         // SAFETY: SDK is trusted
         let data = unsafe {
@@ -29,7 +32,7 @@ impl<'api> Field<'api> {
         Some(unsafe { &mut *data.cast() })
     }
 
-    pub fn get_data_mut<T: 'api>(&self, managed_object: &ManagedObject) -> Option<&mut T> {
-        Self::s_get_data_mut(self.api, self.handle, managed_object)
+    pub fn get_data_mut<T>(&self, managed_object: &ManagedObject) -> Option<&mut T> {
+        Self::s_get_data_mut(self.handle, managed_object)
     }
 }

@@ -1,12 +1,16 @@
 use crate::error::NullPtrError;
+use crate::managed::ManagedSingleton;
+use crate::{NativeSingleton, VMContext};
 use reframework_sys::*;
 use std::error::Error;
+use std::ffi::{CStr, CString};
 use std::fmt::{Display, Formatter};
 use std::sync::OnceLock;
 use tdb::TDB;
 
 pub mod field;
 pub mod hook;
+pub mod invoke;
 pub mod managed_object;
 pub mod method;
 pub mod tdb;
@@ -15,7 +19,7 @@ pub mod type_definition;
 pub(crate) static API_REF: OnceLock<API> = OnceLock::new();
 
 // TODO: make this Debug
-#[derive(Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct API {
     pub name: &'static str,
     pub param: &'static REFrameworkPluginInitializeParam,
@@ -26,13 +30,9 @@ pub struct API {
 
 // TODO: remove this or make sure this is safe
 unsafe impl Sync for API {}
-
 unsafe impl Send for API {}
 
-pub struct MethodParameter<'api> {
-    pub(crate) api: &'api API,
-
-    // lifetime is bound the API, this is therefore implicitly bound too
+pub struct MethodParameter {
     pub(crate) type_definition_handle: *mut REFrameworkTypeDefinitionHandle,
 }
 
@@ -66,10 +66,49 @@ impl API {
     }
 
     pub fn tdb(&self) -> TDB {
-        let functions = unsafe { &(*self.sdk.functions) };
+        let functions = self.sdk_functions();
         let handle = unsafe { functions.get_tdb.expect("not null")() };
 
-        TDB { api: self, handle }
+        TDB { handle }
+    }
+
+    pub fn vm_context(&self) -> Option<VMContext> {
+        let functions = self.sdk_functions();
+        let handle = unsafe { functions.get_vm_context.expect("not null")() };
+
+        if handle.is_null() {
+            return None;
+        }
+
+        Some(VMContext(handle))
+    }
+
+    pub fn native_singleton(&self, type_name: &str) -> Option<NativeSingleton> {
+        let type_name = CString::new(type_name).expect("valid c string");
+
+        let functions = self.sdk_functions();
+        let handle =
+            unsafe { functions.get_native_singleton.expect("not null")(type_name.as_ptr()) };
+
+        if handle.is_null() {
+            return None;
+        }
+
+        Some(NativeSingleton(handle))
+    }
+
+    pub fn managed_singleton(&self, type_name: &str) -> Option<ManagedSingleton> {
+        let type_name = CString::new(type_name).expect("valid c string");
+
+        let functions = self.sdk_functions();
+        let handle =
+            unsafe { functions.get_managed_singleton.expect("not null")(type_name.as_ptr()) };
+
+        if handle.is_null() {
+            return None;
+        }
+
+        Some(ManagedSingleton(handle))
     }
 }
 
