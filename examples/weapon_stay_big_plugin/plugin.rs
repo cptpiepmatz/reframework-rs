@@ -14,15 +14,15 @@ impl Hook for PlayerWeaponCtrlStart {
     fn pre_fn(
         _api: &API,
         _vm_context: Option<&VMContext>,
-        this: Option<&ManagedObject>,
+        this: Option<&mut ManagedObject>,
         _params: &[&MethodParameter],
-    ) -> PreHookResult {
+    ) -> Option<PreHookResult> {
         let this = this.expect("not native and not static");
         if let Some(field) = this.get_field_mut::<f32>("_bodyConstScale") {
             *field = 1.0;
         }
 
-        PreHookResult::CallOriginal
+        Some(PreHookResult::CallOriginal)
     }
 
     type ReturnValue = ();

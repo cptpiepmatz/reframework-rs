@@ -3,10 +3,10 @@ use crate::managed::{ManagedSingleton, ManagedString};
 use crate::managed_object::ManagedObject;
 use crate::private::Sealed;
 use crate::NativeSingleton;
+use reframework_sys::REFrameworkManagedObjectHandle;
 use std::ffi::c_void;
 use std::fmt::{Debug, Display, Formatter};
 use std::{fmt, mem};
-use reframework_sys::REFrameworkManagedObjectHandle;
 
 #[derive(Debug)]
 pub enum InvokeResult<T: From<InvokeValue>> {
@@ -61,7 +61,7 @@ pub union InvokeValue {
     pub as_f32: f32,
     pub as_u64: u64,
     pub as_f64: f64,
-    pub as_ptr: *mut std::ffi::c_void,
+    pub as_mut_ptr: *mut std::ffi::c_void,
 }
 
 impl Debug for InvokeValue {
@@ -77,7 +77,7 @@ impl Debug for InvokeValue {
             s.field("as_f32", &self.as_f32);
             s.field("as_u64", &self.as_u64);
             s.field("as_f64", &self.as_f64);
-            s.field("as_ptr", &self.as_ptr);
+            s.field("as_mut_ptr", &self.as_mut_ptr);
         }
 
         s.finish()
@@ -94,7 +94,7 @@ impl From<InvokeValue> for Option<ManagedObject> {
     fn from(value: InvokeValue) -> Self {
         // SAFETY: this is not safe and we have no way to back this up, we just hope that the
         //         caller knows what type should come out
-        let ptr = unsafe { value.as_ptr };
+        let ptr = unsafe { value.as_mut_ptr };
 
         if ptr.is_null() {
             return None;
@@ -102,6 +102,30 @@ impl From<InvokeValue> for Option<ManagedObject> {
 
         let handle: REFrameworkManagedObjectHandle = ptr.cast();
         Some(ManagedObject { handle })
+    }
+}
+
+impl From<InvokeValue> for bool {
+    fn from(value: InvokeValue) -> Self {
+        unsafe { value.as_byte != 0 }
+    }
+}
+
+impl From<InvokeValue> for usize {
+    fn from(value: InvokeValue) -> Self {
+        unsafe { value.as_u64 as usize }
+    }
+}
+
+impl From<InvokeValue> for u32 {
+    fn from(value: InvokeValue) -> Self {
+        unsafe { value.as_u32 }
+    }
+}
+
+impl From<InvokeValue> for i32 {
+    fn from(value: InvokeValue) -> Self {
+        unsafe { mem::transmute(value.as_u32) }
     }
 }
 
@@ -137,43 +161,57 @@ pub trait InvokeArg: Sealed {
     ///
     /// All non-primitive implementors of this trait only hold a single pointer.
     /// This pointer will be returned here.
-    unsafe fn as_ptr(&self) -> *mut c_void;
+    unsafe fn as_mut_ptr(&mut self) -> *mut c_void;
 }
 
 impl InvokeArg for *mut c_void {
-    unsafe fn as_ptr(&self) -> *mut c_void {
+    unsafe fn as_mut_ptr(&mut self) -> *mut c_void {
         *self
     }
 }
-// impl InvokeArg for REFrameworkManagedObjectHandle {}
+
 impl InvokeArg for ManagedObject {
-    unsafe fn as_ptr(&self) -> *mut c_void {
+    unsafe fn as_mut_ptr(&mut self) -> *mut c_void {
         self.handle.cast()
     }
 }
 
 impl InvokeArg for NativeSingleton {
-    unsafe fn as_ptr(&self) -> *mut c_void {
+    unsafe fn as_mut_ptr(&mut self) -> *mut c_void {
         self.0.cast()
     }
 }
 
 impl InvokeArg for ManagedSingleton {
-    unsafe fn as_ptr(&self) -> *mut c_void {
+    unsafe fn as_mut_ptr(&mut self) -> *mut c_void {
         self.0.cast()
     }
 }
 
 impl InvokeArg for ManagedString {
-    unsafe fn as_ptr(&self) -> *mut c_void {
+    unsafe fn as_mut_ptr(&mut self) -> *mut c_void {
         self.0.cast()
     }
 }
 
+impl InvokeArg for i32 {
+    unsafe fn as_mut_ptr(&mut self) -> *mut c_void {
+        let ptr: *mut i32 = self;
+        ptr.cast()
+    }
+}
+
 impl InvokeArg for u32 {
-    unsafe fn as_ptr(&self) -> *mut c_void {
-        let ptr: *const u32 = self;
-        ptr.cast_mut().cast()
+    unsafe fn as_mut_ptr(&mut self) -> *mut c_void {
+        let ptr: *mut u32 = self;
+        ptr.cast()
+    }
+}
+
+impl InvokeArg for usize {
+    unsafe fn as_mut_ptr(&mut self) -> *mut c_void {
+        let ptr: *mut usize = self;
+        ptr.cast()
     }
 }
 

@@ -1,6 +1,6 @@
 use crate::api::managed_object::ManagedObject;
 use crate::api::API_REF;
-use crate::{MethodParameter, API};
+use crate::{debug, MethodParameter, API};
 use reframework_sys::*;
 use std::collections::HashMap;
 use std::error::Error;
@@ -28,10 +28,10 @@ pub trait Hook {
     fn pre_fn(
         api: &API,
         vm_context: Option<&VMContext>,
-        this: Option<&ManagedObject>,
+        this: Option<&mut ManagedObject>,
         params: &[&MethodParameter],
-    ) -> PreHookResult {
-        PreHookResult::CallOriginal
+    ) -> Option<PreHookResult> {
+        Some(PreHookResult::CallOriginal)
     }
 
     unsafe extern "C" fn pre_fn_raw(
@@ -76,7 +76,10 @@ pub trait Hook {
             }
         }
 
-        Self::pre_fn(api, vm_context.as_ref(), this.as_ref(), params) as c_int
+        match Self::pre_fn(api, vm_context.as_ref(), this.as_mut(), params) {
+            Some(res) => res as c_int,
+            None => PreHookResult::CallOriginal as c_int,
+        }
     }
 
     type ReturnValue;

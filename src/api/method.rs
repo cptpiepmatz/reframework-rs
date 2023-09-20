@@ -94,15 +94,18 @@ impl Method {
 
     pub fn invoke<T>(
         &self,
-        this_ptr: impl InvokeObj,
-        args: &mut [&dyn InvokeArg],
+        this_ptr: &mut impl InvokeObj,
+        args: &mut [&mut dyn InvokeArg],
     ) -> InvokeResult<T>
     where
         T: From<InvokeValue>,
     {
         let mut out = InvokeRet::default();
         let out_ptr: *mut InvokeRet = &mut out;
-        let mut args: Vec<*mut c_void> = args.iter_mut().map(|arg| unsafe { arg.as_ptr() }).collect();
+        let mut args: Vec<*mut c_void> = args
+            .iter_mut()
+            .map(|arg| unsafe { arg.as_mut_ptr() })
+            .collect();
         let in_args_size = args.len() * size_of::<*mut c_void>();
 
         let api = API_REF.get().expect("is init");
@@ -110,7 +113,7 @@ impl Method {
         let result = unsafe {
             method.invoke.expect("not null")(
                 self.handle,
-                this_ptr.as_ptr(),
+                this_ptr.as_mut_ptr(),
                 args.as_mut_ptr(),
                 in_args_size as c_uint,
                 out_ptr.cast(),

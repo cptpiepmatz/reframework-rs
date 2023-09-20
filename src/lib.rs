@@ -1,8 +1,8 @@
 #![allow(clippy::not_unsafe_ptr_arg_deref)] // all safety checks are internally
 #![deny(improper_ctypes_definitions)]
 
-#[cfg(not(windows))]
-compile_error!("This crate can only be compiled on Windows.");
+#[cfg(not(all(target_os = "windows", target_pointer_width = "64")))]
+compile_error!("This crate can only be compiled on 64-Bit Windows.");
 
 use reframework_sys::*;
 use std::ffi::{c_int, c_void};
